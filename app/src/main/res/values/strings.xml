@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">NotificationsExample</string>
+    <string name="long_text">A notification is a message that Android displays outside your apps UI to provide the user with reminders, communication from other people, or other timely information from your app</string>
 </resources>
+
