@@ -107,36 +107,49 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendOnChannel2() {
-
         binding.btnSendOnChannel2.setOnClickListener {
 
-            val progressMax = 100
+            val title1 = "Title1"
+            val message1 = "Message1"
+            val title2 = "Title2"
+            val message2 = "Message2"
 
-            val notification = NotificationCompat.Builder(this, CHANNEL_2_ID)
+            val notification1 = NotificationCompat.Builder(this, CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.ic_baseline_looks_two)
-                .setContentTitle("Download")
-                .setContentText("Download in progress")
+                .setContentTitle(title1)
+                .setContentText(message1)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setProgress(progressMax, 0, false)
+                .setGroup("example_group")
+                .build()
 
-            notificationManager.notify(2, notification.build())
+            val notification2 = NotificationCompat.Builder(this, CHANNEL_2_ID)
+                .setSmallIcon(R.drawable.ic_baseline_looks_two)
+                .setContentTitle(title2)
+                .setContentText(message2)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setGroup("example_group")
+                .build()
 
-            Thread(object : Runnable {
-                override fun run() {
-                    SystemClock.sleep(2000)
-                    for (progress in 0..progressMax step 10) {
-                        notification.setProgress(progressMax, progress, false)
-                        notificationManager.notify(2, notification.build())
-                        SystemClock.sleep(1000)
-                    }
-                    notification.setContentText("Download finished")
-                        .setProgress(progressMax, 0, false)
-                        .setOngoing(false)
-                    notificationManager.notify(2, notification.build())
-                }
-            }).start()
+            val summaryNotification = NotificationCompat.Builder(this, CHANNEL_2_ID)
+                .setSmallIcon(R.drawable.ic_send)
+                .setStyle(NotificationCompat.InboxStyle()
+                    .addLine("$title2 $message2")
+                    .addLine("$title1 $message1")
+                    .setBigContentTitle("2 new messages")
+                    .setSummaryText("user@example.com")
+                )
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setGroup("example_group")
+                .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
+                .setGroupSummary(true)
+                .build()
+
+            SystemClock.sleep(2000)
+            notificationManager.notify(2, notification1)
+            SystemClock.sleep(2000)
+            notificationManager.notify(3, notification2)
+            SystemClock.sleep(2000)
+            notificationManager.notify(4, summaryNotification)
         }
     }
 }
