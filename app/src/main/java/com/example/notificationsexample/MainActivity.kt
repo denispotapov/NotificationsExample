@@ -3,11 +3,10 @@ package com.example.notificationsexample
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.media.session.MediaSessionCompat
+import android.os.SystemClock
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -110,33 +109,34 @@ class MainActivity : AppCompatActivity() {
     private fun sendOnChannel2() {
 
         binding.btnSendOnChannel2.setOnClickListener {
-            val title = binding.editTextTitle.text.toString()
-            val message = binding.editTextMessage.text.toString()
 
-            val artWork = BitmapFactory.decodeResource(resources, R.drawable.cat2)
-
-            val mediaSession = MediaSessionCompat(this, "tag")
+            val progressMax = 100
 
             val notification = NotificationCompat.Builder(this, CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.ic_baseline_looks_two)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setLargeIcon(artWork)
-                .addAction(R.drawable.ic_dislike, "Dislike", null)
-                .addAction(R.drawable.ic_previous, "Previous", null)
-                .addAction(R.drawable.ic_pause, "Pause", null)
-                .addAction(R.drawable.ic_next, "Next", null)
-                .addAction(R.drawable.ic_like, "Like", null)
-                .setStyle(
-                    androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(1, 2, 3)
-                        .setMediaSession(mediaSession.sessionToken)
-                )
-                .setSubText("Sub Text")
+                .setContentTitle("Download")
+                .setContentText("Download in progress")
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .build()
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setProgress(progressMax, 0, false)
 
-            notificationManager.notify(2, notification)
+            notificationManager.notify(2, notification.build())
+
+            Thread(object : Runnable {
+                override fun run() {
+                    SystemClock.sleep(2000)
+                    for (progress in 0..progressMax step 10) {
+                        notification.setProgress(progressMax, progress, false)
+                        notificationManager.notify(2, notification.build())
+                        SystemClock.sleep(1000)
+                    }
+                    notification.setContentText("Download finished")
+                        .setProgress(progressMax, 0, false)
+                        .setOngoing(false)
+                    notificationManager.notify(2, notification.build())
+                }
+            }).start()
         }
     }
 }
