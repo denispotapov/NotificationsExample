@@ -1,19 +1,22 @@
 package com.example.notificationsexample
 
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
+import android.provider.Settings
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
 import com.example.notificationsexample.databinding.ActivityMainBinding
 import timber.log.Timber
-
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,8 +46,46 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendOnChannel1() {
         binding.btnSendOnChannel1.setOnClickListener {
+            if (!notificationManager.areNotificationsEnabled()) {
+                openNotificationSettings()
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isChannelBlocked(CHANNEL_1_ID)) {
+                openChannelSettings(CHANNEL_1_ID)
+            }
+
             SendOnChannel1Notification.sendOnChannel1Notification(this)
         }
+    }
+
+    private fun openNotificationSettings() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+            startActivity(intent)
+        } else {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
+    }
+
+    @RequiresApi(26)
+    private fun isChannelBlocked(channelId: String): Boolean {
+        val manager = getSystemService(NotificationManager::class.java)
+        val channel = manager.getNotificationChannel(channelId)
+
+        return channel != null && channel.importance == NotificationManager.IMPORTANCE_NONE
+    }
+
+    @RequiresApi(26)
+    private fun openChannelSettings(channelId: String) {
+        val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        intent.putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+
+        startActivity(intent)
+
     }
 
     object SendOnChannel1Notification {
@@ -132,11 +173,12 @@ class MainActivity : AppCompatActivity() {
 
             val summaryNotification = NotificationCompat.Builder(this, CHANNEL_2_ID)
                 .setSmallIcon(R.drawable.ic_send)
-                .setStyle(NotificationCompat.InboxStyle()
-                    .addLine("$title2 $message2")
-                    .addLine("$title1 $message1")
-                    .setBigContentTitle("2 new messages")
-                    .setSummaryText("user@example.com")
+                .setStyle(
+                    NotificationCompat.InboxStyle()
+                        .addLine("$title2 $message2")
+                        .addLine("$title1 $message1")
+                        .setBigContentTitle("2 new messages")
+                        .setSummaryText("user@example.com")
                 )
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setGroup("example_group")
