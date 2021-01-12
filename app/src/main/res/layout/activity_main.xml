@@ -31,4 +31,16 @@
         android:layout_height="wrap_content"
         android:text="Send on Channel 2" />
 
+    <Button
+        android:id="@+id/btn_delete_notification_channels"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Channels" />
+
+    <Button
+        android:id="@+id/btn_delete_notification_channel_groups"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Channel Groups" />
+
 </LinearLayout>

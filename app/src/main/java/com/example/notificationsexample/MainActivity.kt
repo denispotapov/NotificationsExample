@@ -38,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         sendOnChannel1()
         sendOnChannel2()
+        deleteNotificationChannels()
+        deleteNotificationChannelGroups()
 
         messages.add(Message("Good Morning!", "Jim"))
         messages.add(Message("Hello!", null))
@@ -192,6 +194,26 @@ class MainActivity : AppCompatActivity() {
             notificationManager.notify(3, notification2)
             SystemClock.sleep(2000)
             notificationManager.notify(4, summaryNotification)
+        }
+    }
+
+    private fun deleteNotificationChannels() {
+        binding.btnDeleteNotificationChannels.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = getSystemService(NotificationManager::class.java)
+                manager.deleteNotificationChannel(CHANNEL_3_ID)
+            }
+        }
+    }
+
+    private fun deleteNotificationChannelGroups() {
+        binding.btnDeleteNotificationChannelGroups.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val manager = getSystemService(NotificationManager::class.java)
+                manager.deleteNotificationChannelGroup(GROUP_1_ID)
+            }
         }
     }
 }
